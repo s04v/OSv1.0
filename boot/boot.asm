@@ -1,4 +1,4 @@
-bits 32
+[bits 32]
 
         ;multiboot spec
         align 4
@@ -7,12 +7,8 @@ bits 32
         dd - (0x1BADB002 + 0x00) ;checksum. m+f+c should be zero
 
 
-section .page_tables, 
-times 4096 db 0 
+global page_directory
 
-global boot_pdpt
-boot_pdpt:
-times 4096 db 0
 
 section .text
 global start
@@ -20,13 +16,56 @@ extern kmain	        ;kmain is defined in the c file
 
 
 
-gdt_start: ; don't remove the labels, they're needed to compute sizes and jumps
-    ; the GDT starts with a null 8-byte
+start:
+        cli 			
+        xor eax, eax
+        mov ds, eax
+        mov esp, stack_space
+
+        call switch_to_pm
+
+        mov eax, 0x0
+        mov ebx, 0x0
+
+BEGIN_PM:
+        
+    push ebx
+    call kmain
+    hlt		 	;halt the CPU
+
+
+switch_to_pm:
+    cli ; 1. disable interrupts
+    lgdt [gdt_descriptor] ; 2. load the GDT descriptor
+    mov eax, cr0
+    or eax, 0x1 ; 3. set 32-bit mode bit in cr0
+    mov cr0, eax
+
+    jmp CODE_SEG:init_pm ; 4. far jump by using a different segment
+
+
+init_pm: ; we are now using 32-bit instructions
+    mov ax, DATA_SEG ; 5. update the segment registers
+    mov ds, ax
+    mov ss, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+
+    mov ebp, 0x90000 ; 6. update the stack right at the top of the free space
+    mov esp, ebp
+
+    call BEGIN_PM 
+
+    ;
+
+
+gdt_start: 
+ 
     dd 0x0 ; 4 byte
     dd 0x0 ; 4 byte
 
-; GDT for code segment. base = 0x00000000, length = 0xfffff
-; for flags, refer to os-dev.pdf document, page 36
+
 gdt_code: 
     dw 0xffff    ; segment length, bits 0-15
     dw 0x0       ; segment base, bits 0-15
@@ -35,8 +74,6 @@ gdt_code:
     db 11001111b ; flags (4 bits) + segment length, bits 16-19
     db 0x0       ; segment base, bits 24-31
 
-; GDT for data segment. base and length identical to code segment
-; some flags changed, again, refer to os-dev.pdf
 gdt_data:
     dw 0xffff
     dw 0x0
@@ -57,61 +94,13 @@ CODE_SEG equ gdt_code - gdt_start
 DATA_SEG equ gdt_data - gdt_start
 
 
-
-start:
-        cli 			;block interrupts
-        xor eax, eax
-        mov ds, eax
-
-        lgdt [gdt_descriptor]
-
-        mov eax, cr0
-        or eax, 1
-        mov cr0, eax
-
-        mov eax, DATA_SEG ; 5. update the segment registers
-        mov ds, eax
-        mov ss, eax
-        mov es, eax
-        mov fs, eax
-        mov gs, eax
-  ;mov eax, [boot_pdpt]
-  ;sub eax, 0xc0000000
-  ;mov cr3, eax
-  ;mov esp, stack_space	;set stack pointer
-
-
-  ;mov eax, cr4
-  ;or eax, 0x60
-  ;mov cr4, eax
-
-  ;mov eax, cr0
-  ;or eax, 0x80000000
-  ;mov cr0, eax
-  
-  
-  ;enable paging
-        mov cr3, eax
-
-        mov ebx, cr4        ; read current cr4
-        or  ebx, 0x00000010 ; set PSE
-        mov cr4, ebx        ; update cr4
-
-        ;mov ebx, cr0        ; read current cr0
-        ;or  ebx, 0x80000000 ; set PG
-        ;mov cr0, ebx        ; update cr0
-
-  
-
-    call kmain
-    hlt		 	;halt the CPU
-
-
-
-
+section .data
 
 
 section .bss
+
+    
+
 resb 8192		;8KB for stack
 stack_space:
 
