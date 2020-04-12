@@ -59,7 +59,7 @@ void isr_install() {
     outb(0x21, 0xFF);
     outb(0xA1, 0xFF); 
 
-    
+
 
     // Install the IRQs
     set_idt_gate(32, (u32)irq0);
@@ -132,7 +132,6 @@ void register_interrupt_handler(u8 n, isr_t handler) {
 }
 
 void irq_handler(registers_t r) {
-   dlog("%d",r.int_no);
     /* After every interrupt we need to send an EOI to the PICs
      * or they will not send another interrupt again */
     if (r.int_no >= 40) outb(0xA0, 0x20); /* slave */

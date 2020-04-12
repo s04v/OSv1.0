@@ -1,6 +1,7 @@
 #include <types.h>
 #include <drivers/screen.h>
 
+u8 scroll_f;
 
 void screen() {   
     _X = 0;
@@ -16,7 +17,7 @@ void put(char c) {
     {
         scroll();
         _Y = MAX_ROWS-1;
-        //move_cursor();
+        move_cursor();
         return;
     }
     
@@ -30,7 +31,7 @@ void put(char c) {
 	vid[_X + _Y*MAX_COLS*2] = c;
 	vid[_X + 1 + _Y*MAX_COLS*2] = 7;
 	_X += 2;
-    //move_cursor();
+    move_cursor();
 }
 
 void clear_screen(){
@@ -40,7 +41,7 @@ void clear_screen(){
 		put(' ');
 	}
 	set_cursor(0,0);
-    //move_cursor();
+    move_cursor();
 }
 
 
@@ -57,5 +58,15 @@ void scroll()
   	memcpy((char*)(0xB8000 + MAX_COLS*2), (char*)0xB8000, MAX_COLS*MAX_ROWS*2);
 }
 
+
+void move_cursor()
+{
+   // The screen is 80 characters wide...
+   unsigned short cursorLocation = _Y * 80 + _X/2;
+   outb(0x3D4, 14);                  // Tell the VGA board we are setting the high cursor byte.
+   outb(0x3D5, cursorLocation >> 8); // Send the high cursor byte.
+   outb(0x3D4, 15);                  // Tell the VGA board we are setting the low cursor byte.
+   outb(0x3D5, cursorLocation);      // Send the low cursor byte.
+}
 
 //todo move_cursor
