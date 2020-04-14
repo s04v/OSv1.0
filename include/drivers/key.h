@@ -16,9 +16,13 @@
 #define ALT    	0x38
 #define DEL    	0x53
 
+
+#define SPACE 0x39
+#define ENTER 0x1C
+
 #define ESC 0x1B
 
-int keymap[53][2];
+int keymap[57][2];
 
 
 
@@ -26,7 +30,7 @@ int keymap[53][2];
 void handle_key(u8 scancode);
 void init_keyboard();
 
-char print_letter(u8 code);
+char kb2(u8 code);
 
 
 

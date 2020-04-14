@@ -34,5 +34,5 @@ void move_cursor();  /* move cursor at _X,_Y position */
 //void kprintfn(char* fmt,...);
 
 
-//void backspace();
+void backspace();
 #endif

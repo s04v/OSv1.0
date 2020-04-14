@@ -23,16 +23,14 @@ void kmain(int addr) {
 	screen();
 
 	clear_screen();
-	
-	
+	kprint("CoronaOS");
 
-	 kprint("CoronaOS");
-	 int a = 0xFAFA;
-	dlog("%x", &a);	
 	isr_install();
 	asm volatile("sti");
-
 	init_keyboard();
+	init_shell();
+
+
 	//init_timer();
 	//init_shell();
 	//shell_print(1);

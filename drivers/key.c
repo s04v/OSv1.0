@@ -1,27 +1,17 @@
 #include <stdlib.h>
 #include <interrupt/isr.h>
-#include <kernel/debug.h>
 #include <drivers/key.h>
-#include <kernel/shell.h>
 #include <drivers/screen.h>
+#include <kernel/debug.h>
+#include <kernel/shell.h>
 #include <kernel/kprintf.h>
 
 static void keyboard_callback() {
     
     u8 scancode = inb(0x60);
-
-    dlog("%d",scancode);
     char *sc_ascii = convert(scancode, 10);
+    kb2(scancode);
     
-    //char *vid = (char*) 0xb8000;
-    
-   // *vid = '1';
-    //dlog("mem - %c",*vid);
-    kprintf("int");
-
-   // print_letter(scancode);
-    
-
 }
 
 void init_keyboard() {
@@ -31,7 +21,7 @@ void init_keyboard() {
    //l_shift = 0;
 }
 
-char print_letter(u8 code) {
+char kb2(u8 code) {
     static u8 l_shift = 0;
     static u8 l_alt = 0;
     static u8 l_ctrl = 0;
@@ -39,25 +29,28 @@ char print_letter(u8 code) {
     char key;
 
    
-
-    if(code == LSHIFT_P)
-    {   
-        l_shift = 1;
-        return -1;
-    }
-    
-    if(code == LSHIFT_R)
+    switch(code)
     {
-         l_shift = 0;
-         return -1;
-    }   
+        case LSHIFT_P:
+            l_shift = 1;
+            return -1;
+        case LSHIFT_R:
+            l_shift = 0;
+            return -1;
+        case SPACE:
+            shell_print(SPACE);
+            return -1;
+        case ENTER:
+            shell_print(ENTER);
+            return -1;
+    }
 
     if(code <= 52) {
-        
+
         if(l_shift)
-            put(keymap[code][1]);
+            shell_print(keymap[code][1]);
         else
-            put(keymap[code][0]);
+            shell_print(keymap[code][0]);
     }
 
     
@@ -80,7 +73,7 @@ int keymap[][2] = {
 	/* 22 */	{'u', 'U'},  {'i', 'I'},
 	/* 24 */	{'o', 'O'},  {'p', 'P'},
 	/* 26 */	{'�', '`'},  {'[', '{'},
-	/* 28 */	{'\n', 0},   {'/', '?'},
+	/* 28 */	{ENTER, 0},   {'/', '?'},
 	/* 30 */	{'a', 'A'},  {'s', 'S'},
 	/* 32 */	{'d', 'D'},  {'f', 'F'},
 	/* 34 */	{'g', 'G'},  {'h', 'H'},
@@ -93,4 +86,5 @@ int keymap[][2] = {
 	/* 48 */	{'b', 'B'},  {'n', 'N'},
 	/* 50 */	{'m', 'M'},  {',', '<'},
 	/* 52 */	{'.', '>'},  {';', ':'},
+
 };

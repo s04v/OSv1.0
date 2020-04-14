@@ -5,7 +5,7 @@
 void init_shell();
 
 void shell_print(char code);
-
+void line();
 
 
 #endif

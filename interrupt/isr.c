@@ -135,7 +135,7 @@ void register_interrupt_handler(u8 n, isr_t handler) {
 
 void irq_handler(registers_t r) {
 
-    dlog("int");
+    //dlog("int");
     /* After every interrupt we need to send an EOI to the PICs
      * or they will not send another interrupt again */
     if (r.int_no >= 40) outb(0xA0, 0x20); /* slave */

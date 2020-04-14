@@ -1,4 +1,4 @@
-#include <types.h>
+#include <types.h>	
 #include <drivers/screen.h>
 
 u8 scroll_f;
@@ -6,7 +6,7 @@ u8 scroll_f;
 void screen() {   
     _X = 0;
  	_Y = 0;
-  	//scroll_f= 0;
+  	scroll_f= 0;
 }
 
 
@@ -15,22 +15,32 @@ void put(char c) {
 	
     if(_Y>= MAX_ROWS)
     {
-        scroll();
-        _Y = MAX_ROWS-1;
+        //scroll();
+        _Y = MAX_COLS-1;
         move_cursor();
         return;
     }
+
+
     
     if (c == '\n')
    	{
        	_X = 0;
        	_Y++;
+	    move_cursor();
+
 		return;
 	}
 
 	vid[_X + _Y*MAX_COLS*2] = c;
 	vid[_X + 1 + _Y*MAX_COLS*2] = 7;
 	_X += 2;
+	
+	if(_X > MAX_COLS*2)
+	{
+		_Y++;
+		_X = 0;
+	}
     move_cursor();
 }
 
