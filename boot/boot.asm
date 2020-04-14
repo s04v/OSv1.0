@@ -94,12 +94,10 @@ CODE_SEG equ gdt_code - gdt_start
 DATA_SEG equ gdt_data - gdt_start
 
 
-section .data
 
 
 section .bss
 
-    
 
 resb 8192		;8KB for stack
 stack_space:

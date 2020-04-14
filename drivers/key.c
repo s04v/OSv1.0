@@ -6,19 +6,27 @@
 #include <drivers/screen.h>
 #include <kernel/kprintf.h>
 
-static void keyboard_callback(registers_t regs) {
+static void keyboard_callback() {
+    
     u8 scancode = inb(0x60);
-    char *sc_ascii = convert(scancode, 10);
-    dlog("%d",scancode);
 
-    print_letter(scancode);
+    dlog("%d",scancode);
+    char *sc_ascii = convert(scancode, 10);
+    
+    //char *vid = (char*) 0xb8000;
+    
+   // *vid = '1';
+    //dlog("mem - %c",*vid);
+    kprintf("int");
+
+   // print_letter(scancode);
     
 
 }
 
 void init_keyboard() {
 
-   register_interrupt_handler(IRQ1, keyboard_callback); 
+   register_interrupt_handler(IRQ1, &keyboard_callback); 
    irq_enable(1);
    //l_shift = 0;
 }

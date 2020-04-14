@@ -5,7 +5,9 @@
 #include <types.h>
 
 
-#define KERNEL_CS 0x08
+
+
+#define KERNEL_CS 0x18
 
 typedef struct {
     u16 low_offset; /* Lower 16 bits of handler function address */

@@ -11,19 +11,19 @@ C_SOURCES = $(wildcard \
 HEADERS = $(wirdcard include/*.h include/std/*.h include/drivers/*.h include/kernel/*.h)
 
 
-OBJ = ${C_SOURCES:.c=.o boot/boot.o  interrupt/interrupts.o}
+OBJ = ${C_SOURCES:.c=.o boot/boot2.o  interrupt/interrupts.o}
 
 INCLUDES = \
 	-Iinclude/
 
 
-FLAGS = -mno-sse -nostdlib -nostdinc -fno-builtin -nostartfiles -nodefaultlibs -fno-stack-protector -ffreestanding -std=gnu99 -nostdinc
+FLAGS = -fno-pic -mno-sse -nostdlib -nostdinc -fno-builtin -nostartfiles -nodefaultlibs -fno-stack-protector -ffreestanding -std=gnu99 -nostdinc
 
 
 
 
 run: kernel.bin
-	qemu-system-i386 -serial stdio -m 152 -kernel kernel.bin
+	qemu-system-i386 -vga virtio -serial stdio -m 152 -kernel kernel.bin
 	#-monitor stdio
 	#
 	make clean
@@ -34,16 +34,15 @@ db: kernel.bin
 
 
 kernel.bin: kernel/kernel.o  ${OBJ}
-	ld -m elf_i386 -T link.ld -o $@  $^
+	ld -m elf_i386 -T kern.ld -o $@  $^
 
 
+%.o: %.c ${HEADERS}
+	gcc  -w ${INCLUDES} ${FLAGS} -m32 -c   $< -o $@
+%.o: %.asm
+	nasm -f elf32 $< -o $@
 
 clean:
 	@rm */*.o
 	@rm */*/*.o
 	@rm kernel.bin
-
-%.o: %.c ${HEADERS}
-	gcc  -w ${INCLUDES} ${FLAGS} -m32 -c  $< -o $@
-%.o: %.asm
-	nasm -f elf32 $< -o $@

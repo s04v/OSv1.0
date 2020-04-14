@@ -1,11 +1,12 @@
 #include <types.h>
-#include <drivers/screen.h>
 #include <stdlib.h>
 #include <kernel/kprintf.h>
 #include <kernel/debug.h>
+#include <kernel/shell.h>
 #include <interrupt/idt.h>
 #include <drivers/key.h>
-#include <kernel/shell.h>
+#include <drivers/screen.h>
+#include <cpu/port.h>
 
 #define PIC1 0x20
 #define PIC2 0xA0
@@ -16,8 +17,6 @@
 extern int text_start;
 extern int text_end;
 
-void p();
-
 void kmain(int addr) {
 
 
@@ -25,17 +24,21 @@ void kmain(int addr) {
 
 	clear_screen();
 	
-	kprint("CoronaOS");	
+	
+
+	 kprint("CoronaOS");
+	 int a = 0xFAFA;
+	dlog("%x", &a);	
 	isr_install();
 	asm volatile("sti");
 
 	init_keyboard();
+	//init_timer();
+	//init_shell();
+	//shell_print(1);
 
-	init_shell();
-	shell_print(1);
-
-	print_letter(0x20);
-	p();
+	//char *vid = (char*) VIDEO_ADDRESS;
+	//dlog("memkernel - %c",*vid);
 
 
 	//init_timer(50);

@@ -56,8 +56,8 @@ void isr_install() {
    /*
     * disable all interrupts
     */
-    outb(0x21, 0xFF);
-    outb(0xA1, 0xFF); 
+    //outb(0x21, 0xFF);
+    // outb(0xA1, 0xFF); 
 
 
 
@@ -121,9 +121,11 @@ char *exception_messages[] = {
 };
 
 
+
+
 void isr_handler(registers_t regs)
 {
-   dlog("recieved interrupt: %x \n", regs.int_no);
+   dlog("recieved interrupt: %x \n", 1);
 }
 
 
@@ -132,6 +134,8 @@ void register_interrupt_handler(u8 n, isr_t handler) {
 }
 
 void irq_handler(registers_t r) {
+
+    dlog("int");
     /* After every interrupt we need to send an EOI to the PICs
      * or they will not send another interrupt again */
     if (r.int_no >= 40) outb(0xA0, 0x20); /* slave */
