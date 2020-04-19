@@ -57,7 +57,7 @@ void isr_install() {
     * disable all interrupts
     */
     //outb(0x21, 0xFF);
-    // outb(0xA1, 0xFF); 
+    //outb(0xA1, 0xFF); 
 
 
 

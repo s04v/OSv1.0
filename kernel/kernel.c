@@ -3,33 +3,38 @@
 #include <kernel/kprintf.h>
 #include <kernel/debug.h>
 #include <kernel/shell.h>
+#include <kernel/multiboot.h>
 #include <interrupt/idt.h>
 #include <drivers/key.h>
 #include <drivers/screen.h>
+#include <drivers/pci.h>
 #include <cpu/port.h>
+#include <mm/mm.h>
 
-#define PIC1 0x20
-#define PIC2 0xA0
 
-#define ICW1 0x11
-#define ICW4 0x01
+void kmain(multiboot_info_t* mbd) {
 
-extern int text_start;
-extern int text_end;
-
-void kmain(int addr) {
-
+	mbd= (multiboot_info_t*) (((u32*)mbd) + 0xC0000000);
 
 	screen();
+	
 
 	clear_screen();
-	kprint("CoronaOS");
+	kprint("MyOS");
 
 	isr_install();
 	asm volatile("sti");
 	init_keyboard();
 	init_shell();
+	heap();
 
+	dlog("mods - %d", mbd->mods_count);
+	pci_init();
+	u8 *b = kmalloc(100);
+	pci_proc_dump(b);
+
+
+	//count_memory();
 
 	//init_timer();
 	//init_shell();

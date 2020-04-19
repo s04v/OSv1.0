@@ -7,7 +7,11 @@ C_SOURCES = $(wildcard \
 	mm/*.c \
 	shell/*.c \
 	keyboard/*.c \
-	interrupt/*.c )
+	interrupt/*.c \
+	pci/*.c \
+	fs/*.c )
+
+
 HEADERS = $(wirdcard include/*.h include/std/*.h include/drivers/*.h include/kernel/*.h)
 
 
@@ -23,13 +27,13 @@ FLAGS = -fno-pic -mno-sse -nostdlib -nostdinc -fno-builtin -nostartfiles -nodefa
 
 
 run: kernel.bin
-	qemu-system-i386 -vga virtio -serial stdio -m 152 -kernel kernel.bin
+	qemu-system-i386 -hda hard.img -vga virtio -serial stdio -m 152 -kernel kernel.bin
 	#-monitor stdio
 	#
 	make clean
 
 db: kernel.bin
-	qemu-system-i386 -d cpu -D log.txt -serial stdio -m 152 -kernel kernel.bin
+	qemu-system-x86_64  -serial stdio -m 152 -kernel kernel.bin -hda hard.img
 	make clean
 
 

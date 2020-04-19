@@ -13,10 +13,10 @@ void outb(u16 port, u8 data) {
 
 u16 inw(u16 port) {
     u16 result;
-    __asm__("in %%dx, %%ax" : "=a" (result) : "d" (port));
+    __asm__("inl %%dx, %%ax" : "=a" (result) : "d" (port));
     return result;
 }
 
-void outw(u16 port, u16 data) {
-    __asm__("out %%ax, %%dx" : : "a" (data), "d" (port));
+void outw(u32 port, u32 data) {
+    __asm__("outl %%ax, %%dx" : : "a" (data), "d" (port));
 }

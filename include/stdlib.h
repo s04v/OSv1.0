@@ -4,6 +4,7 @@
 #include <std/memcpy.h> 
 #include <std/memset.h> 
 #include <std/strcmp.h> 
+#include <std/strcpy.h> 
 #include <std/strlen.h> 
 #include <std/convert.h>
 
